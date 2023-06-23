@@ -1,12 +1,17 @@
 from pylablib.devices import Attocube
 # import time
-# atc1 = Attocube.ANC300("COM5")  # USB or RS232 connection
+atc1 = Attocube.ANC300("COM4")  # USB or RS232 connection
 # x = atc1.get_mode()
 # print([i for i in x.values()])
 # atc1.enable_axis(1, 'off')
 # y=atc1.is_enabled()
-# atc1.measure_capacitance()
-# print('measured')
+# atc1.measure_capacitance("all")
+# x = atc1.get_capacitance("all")
+x = (atc1.get_mode(1) == 'off') and (atc1.get_mode(2) == 'off')
+print(x)
+print(atc1.get_mode(1))
+print(atc1.get_mode(2))
+
 # print(atc1.get_frequency(4))
 # a=[0,1,2,3,4,5]
 # print(a[4:])
@@ -49,6 +54,6 @@ from pylablib.devices import Attocube
 # x[3:,:] = 3
 # x[2:,4:] = 3
 # print(x)
-x, y, z = [0,1,2]
-print(x)
+# x, y, z = [0,1,2]
+# print(x)
 

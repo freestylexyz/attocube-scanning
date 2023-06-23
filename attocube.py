@@ -52,13 +52,13 @@ class Controller(QObject):
             self.atto.measure_capacitance(axis)
             try:
                 cap = self.atto.get_capacitance(axis)
-                self.CapMeasured.emit(cap)
+                self.CapMeasured.emit(axis, cap)
             except:
                 print('axis ' + str(axis) + ' capacitance is not available')
         else:
-            self.atto.measure_capacitance(all)
+            self.atto.measure_capacitance("all")
             try:
-                cap = self.atto.get_capacitance(axis)
+                cap = self.atto.get_capacitance("all")
                 self.CapMeasuredAll.emit([i for i in cap.values()])
             except:
                 print('one of the axis capacitance is not available')
@@ -142,10 +142,9 @@ class Controller(QObject):
         # Check if scan doable
         start_flag1 = (self.atto.get_mode(1) == 'off') and (self.atto.get_mode(2) == 'off')
         start_flag2 = (scan_size / 2) < x_center < (150 - (scan_size / 2)) and (scan_size / 2) < y_center < (150 - (scan_size / 2))
-        start_flag = start_flag1 and start_flag2
 
         # Check if the axis is in offset mode, abort if not
-        if start_flag:
+        if start_flag1 and start_flag2:
             self.scan_flag = False
             self.ramp_flag = False
 
@@ -178,13 +177,12 @@ class Controller(QObject):
 
             self.scan_flag = True
             self.ramp_flag = True
+        elif not start_flag1:
+            print('scan aborted because of axis disabled')
+        elif not start_flag2:
+            print('out of scan range')
         else:
-            if start_flag1:
-                print('scan aborted because of axis disabled')
-            elif start_flag2:
-                print('out of scan range')
-            else:
-                print('you may have bugs')
+            print('you may have bugs')
         self.ScanFinished.emit()
 
     def close(self):

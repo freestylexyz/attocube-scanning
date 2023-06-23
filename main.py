@@ -61,7 +61,7 @@ class AttocubeScanning(QWidget, Ui_Scan_UI):
         self.setupUi(self)
         self.setup = Setup()
         self.thread = QThread()
-        self.control = Controller(attocube_addr='COM5', sr860_addr='USB0::0xB506::0x2000::003476::INSTR')
+        self.control = Controller(attocube_addr='COM4', sr860_addr='GPIB0::1::INSTR')
         self.control.moveToThread(self.thread)
 
         # Variables
@@ -164,7 +164,7 @@ class AttocubeScanning(QWidget, Ui_Scan_UI):
         label_list = [self.setup.X_scan_cap_label, self.setup.Y_scan_cap_label,
                       self.setup.Z_scan_cap_label, self.setup.X_coarse_cap_label,
                       self.setup.Y_coarse_cap_label, self.setup.Z_coarse_cap_label]
-        label_list[axis-1].setText(text_list[axis-1] + str(cap))
+        label_list[axis-1].setText(text_list[axis-1] + str(int(cap*10e8)) + 'nF')
 
     def cap_update_all(self, cap_list):
         text_list = ['X: ', 'Y: ', 'Z: ', 'X: ', 'Y: ', 'Z: ']
@@ -172,7 +172,7 @@ class AttocubeScanning(QWidget, Ui_Scan_UI):
                       self.setup.Z_scan_cap_label, self.setup.X_coarse_cap_label,
                       self.setup.Y_coarse_cap_label, self.setup.Z_coarse_cap_label]
         for i, cap in enumerate(cap_list):
-            label_list[i].setText(text_list[i] + str(cap) + 'nF')
+            label_list[i].setText(text_list[i] + str(int(cap*10e8))  + 'nF')
 
     def change_frequency(self, axis):
         spinbox_list = [self.setup.X_frequency_spinbox, self.setup.Y_frequency_spinbox,
