@@ -1,6 +1,7 @@
 from pylablib.devices import Attocube
 from PySide6.QtCore import QObject, Signal, Slot
 from qcodes.instrument_drivers.stanford_research.SR860 import SR860
+from qcodes.instrument_drivers.stanford_research.SR830 import SR830
 import time
 
 
@@ -10,11 +11,11 @@ class Controller(QObject):
     CapMeasured = Signal(int, float)
     CapMeasuredAll = Signal(list)
     ParaSync = Signal(list, list)
-    data_signal = Signal(float, int, int)
+    data_signal = Signal(list, int, int)
     MoveFinished = Signal()
     ScanFinished = Signal()
 
-    def __init__(self, attocube_addr='COM5', sr860_addr='USB0::0xB506::0x2000::003476::INSTR'):
+    def __init__(self, attocube_addr='COM5', sr860_addr='GPIB0::1::INSTR', sr830_addr='GPIB0::4::INSTR'):
         super().__init__()
         self.ramp_flag = True
         self.scan_flag = True
@@ -33,6 +34,13 @@ class Controller(QObject):
         except:
             self.sr860_flag = False
             print("Cannot connect SR860")
+
+        try:
+            self.sr830 = SR830('SR830', sr830_addr)
+            self.sr830_flag = True
+        except:
+            self.sr830_flag = False
+            print("Cannot connect SR830")
 
     def enable(self, axis, flag):
         if 0 < axis < 7:
@@ -153,16 +161,18 @@ class Controller(QObject):
                 self.ramp_1d(1, x_start, move_step, move_delay, True)  # need to figure out X and Y axis !!!
             if not self.scan_flag:
                 self.ramp_1d(2, y_start, move_step, move_delay, True)
-            time.sleep(0.2)
+            time.sleep(read_delay/50)
 
             # Scan
             for i in range(pixel_num):
-                self.atto.set_offset(2, (step_size * i) + y_start)
+                y_out = (step_size * i) + y_start
+                self.atto.set_offset(2, y_out)
                 time.sleep(line_delay / 1000)
                 for j in range(pixel_num):
-                    self.atto.set_offset(1, (step_size * j) + x_start)
+                    x_out = (step_size * j) + x_start
+                    self.atto.set_offset(1, x_out)
                     time.sleep(read_delay / 1000)
-                    self.data_signal.emit(self.sr860.X(), i, j)
+                    self.data_signal.emit([self.sr860.X(), self.sr860.Y(), self.sr830.X(), self.sr830.Y()], i, j)
                     if self.scan_flag:
                         break
                 if self.scan_flag or (i == (pixel_num - 1)):
@@ -188,3 +198,9 @@ class Controller(QObject):
     def close(self):
         if self.atto_flag:
             self.atto.close()
+        if self.sr860_flag:
+            for i in SR860.instances():
+                i.close()
+        if self.sr830_flag:
+            for i in SR830.instances():
+                i.close()
