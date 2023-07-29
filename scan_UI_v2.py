@@ -25,7 +25,7 @@ class Ui_Scan_UI(object):
     def setupUi(self, Scan_UI):
         if not Scan_UI.objectName():
             Scan_UI.setObjectName(u"Scan_UI")
-        Scan_UI.resize(1074, 753)
+        Scan_UI.resize(1409, 753)
         self.horizontalLayout_2 = QHBoxLayout(Scan_UI)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.gridLayout = QGridLayout()
@@ -138,6 +138,11 @@ class Ui_Scan_UI(object):
 
 
         self.verticalLayout.addWidget(self.Move_groupbox)
+
+        self.poslabel = QLabel(self.groupBox)
+        self.poslabel.setObjectName(u"poslabel")
+
+        self.verticalLayout.addWidget(self.poslabel)
 
         self.Image_groupbox = QGroupBox(self.groupBox)
         self.Image_groupbox.setObjectName(u"Image_groupbox")
@@ -329,6 +334,7 @@ class Ui_Scan_UI(object):
         self.label_2.setText(QCoreApplication.translate("Scan_UI", u"Y", None))
         self.label_3.setText(QCoreApplication.translate("Scan_UI", u"speed (V/s)", None))
         self.start_move_button.setText(QCoreApplication.translate("Scan_UI", u"Move to", None))
+        self.poslabel.setText(QCoreApplication.translate("Scan_UI", u"Position:", None))
         self.Image_groupbox.setTitle(QCoreApplication.translate("Scan_UI", u"Image", None))
         self.label_8.setText(QCoreApplication.translate("Scan_UI", u"Scan direction", None))
         self.label_9.setText(QCoreApplication.translate("Scan_UI", u"Starting corner", None))

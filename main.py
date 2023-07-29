@@ -56,7 +56,8 @@ class AttocubeScanning(QWidget, Ui_Scan_UI):
         # self.Image_View_4.addItem(self.map_4)
 
         # Variables
-        self.data = np.array([[]])
+        pixel_num = self.pixelnum_scan_spinbox.value()
+        self.data = self.data = np.zeros((4, pixel_num, pixel_num))
         self.darkest = np.zeros(4)
 
         # Sync
@@ -89,6 +90,15 @@ class AttocubeScanning(QWidget, Ui_Scan_UI):
         # Start preparation
         self.setup.show()
         self.thread.start()
+
+        views = [self.Image_View_1, self.Image_View_2, self.Image_View_3, self.Image_View_4]
+        for k in range(4):
+            views[k].setImage(self.data[k])
+            views[k].imageItem.hoverEvent = self.imageHoverEvent
+        # self.Image_View_1.imageItem.hoverEvent = self.imageHoverEvent
+        # self.Image_View_2.imageItem.hoverEvent = self.imageHoverEvent
+        # self.Image_View_3.imageItem.hoverEvent = self.imageHoverEvent
+        # self.Image_View_4.imageItem.hoverEvent = self.imageHoverEvent
 
     # Emitting operation slots
     def scan(self):
@@ -129,6 +139,20 @@ class AttocubeScanning(QWidget, Ui_Scan_UI):
             self.data[k, i, j + 1:] = self.darkest[k]
             self.data[k, i + 1:, :] = self.darkest[k]
             views[k].setImage(self.data[k])
+
+    def imageHoverEvent(self, event):
+        center = [self.Xcenter_scan_spinbox.value(), self.Ycenter_scan_spinbox.value()]
+        pixel_num = self.pixelnum_scan_spinbox.value()
+        scan_size = self.range_scan_spinbox.value()
+        x_start, y_start = center[0] - (scan_size / 2), center[1] - (scan_size / 2)
+        step_size = scan_size / (pixel_num - 1)
+        if event.isExit():
+            self.poslabel.setText("Position:")
+            return
+        pos = event.pos()
+        i, j = pos.y(), pos.x()
+        x, y = (i * step_size) + x_start, (j * step_size) + y_start
+        self.poslabel.setText("Position: (%0.1f, %0.1f)" % (x, y))
 
     def closeEvent(self, event):
         self.setup.close()
